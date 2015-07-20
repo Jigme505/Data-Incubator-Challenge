@@ -4,7 +4,7 @@
 
 ## The Data
 
-I used the World Bank website to download all my data in .xls format. Then I converted them into .csv format and loaded it into R:
+I used the World Bank's website to download all my data in .xls format. Then I converted them into .csv format and loaded it into R:
 
 
 ```r
@@ -98,7 +98,7 @@ country_df <- newdata[1:220,]
 
 ## Graphs and Plots
 
-Here I used rcharts to make a highplot 
+Here I used rcharts to make a highchart 
 
 ```r
 require(devtools)
@@ -116,7 +116,47 @@ h1$plotOptions(bubble = list(dataLabels = list(enabled = TRUE, x = 0,
                                             return this.point.name;
                                             } !#", style=list(color= 'black'))))
 h1$save('h1.html', cdn=TRUE)
-browseURL('h1.html')
 ```
 
+## Panel Plot for Country Level Crossectional Data
 
+```r
+require(ggplot2)
+require(grid)
+
+
+# First plot
+p1 <- qplot(corruption, informal_compete, data = country_df) +
+  ylab("Facing Informal Competition (% of Firms)") + 
+  xlab("Corruption (% of firms w/1 Incident)") +
+  stat_smooth(method = "lm", se=T)+
+  ggtitle("Corruption Vs. Informal Competition")
+
+# Second plot
+p2 <- qplot(dom_crdt_to_priv_sec, starting_bness_cost , data = country_df) +
+  geom_point(alpha=.3) +ylab("Cost (% of GNI per capita)") +
+  xlab("Domestic Credit (% of GDP)") +
+  stat_smooth(method = "lm", se=T)+
+  ylim(0,250)+
+  ggtitle("Credit Vs. Cost")
+
+# Third plot
+p3 <- qplot(crime, risk_premium_lending) +
+  ylab("Lending Risk Premium (% points)") + 
+  xlab("Loss due to Crime (% of Sales)") +
+  stat_smooth(method = "lm", se=T)+
+  ggtitle("Crime Loss Vs. Risk Premium")
+
+# Fourth plot
+p4 <- qplot(dom_crdt_to_priv_sec, risk_premium_lending) +
+  xlab("Domestic Credit (% of GDP)") +
+  ylab("Lending Risk Premium (% points)") +
+  xlim(0,150)+ stat_smooth(method = "lm", se=T)+
+  ggtitle("Credit Vs. Lending Risk Premium")
+
+## putting it in one panel
+source('multiplot.R')
+multiplot(p1,p2,p3,p4,cols=2)
+```
+
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png) 
